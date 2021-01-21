@@ -7,7 +7,7 @@ const MachineDetailsContainer = ({ id }) => {
   const machine = useSelector(state => selectMachineById(state, id))
 
   return machine
-    ? <MachineDetails {...machine} />
+    ? <MachineDetails machine={machine} />
     : "Loading machine details"
 }
 

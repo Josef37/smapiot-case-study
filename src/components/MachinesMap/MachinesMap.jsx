@@ -4,7 +4,7 @@ import { MapContainer, TileLayer, Marker, Tooltip } from 'react-leaflet'
 import { getIconByType } from '../../utils/mapIcon'
 import 'leaflet/dist/leaflet.css';
 
-const MachinesMap = ({ machines }) => {
+const MachinesMap = ({ machines, mapContainerProps = {}, disabled }) => {
   const outerBounds = machines.map(machine => ([
     machine.longitude,
     machine.latitude
@@ -14,14 +14,14 @@ const MachinesMap = ({ machines }) => {
   return (
     <MapContainer
       bounds={outerBounds}
-      boundsOptions={{ padding: [100, 100] }}
       zoomSnap={0.25}
-      style={{ height: "90vh" }}
+      {...(disabled && disabledMapProps)}
+      {...mapContainerProps}
     >
       <TileLayer
         attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         maxZoom={22}
-        maxNativeZoom={18}
+        maxNativeZoom={19}
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
       />
       {
@@ -33,6 +33,7 @@ const MachinesMap = ({ machines }) => {
             eventHandlers={{
               click: () => history.push(`/machines/${machine.id}`)
             }}
+            interactive={!disabled}
           >
             <Tooltip>
               {machine.id}
@@ -42,6 +43,16 @@ const MachinesMap = ({ machines }) => {
       }
     </MapContainer>
   )
+}
+
+const disabledMapProps = {
+  dragging: false,
+  touchZoom: false,
+  doubleClickZoom: false,
+  scrollWheelZoom: false,
+  boxZoom: false,
+  keyboard: false,
+  tap: false,
 }
 
 export default MachinesMap

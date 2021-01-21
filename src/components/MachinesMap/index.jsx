@@ -12,7 +12,13 @@ const MachinesMapContainer = () => {
 
   return (
     <Suspense fallback="Loading map">
-      <MachinesMap machines={machines} />
+      <MachinesMap
+        machines={machines}
+        mapContainerProps={{
+          style: { height: "90vh" },
+          boundsOptions: { padding: [100, 100], maxZoom: 20 }
+        }}
+      />
     </Suspense>
   )
 }
