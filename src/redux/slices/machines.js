@@ -34,9 +34,9 @@ const machines = createSlice({
       state.isLoading = false
       machinesAdapter.addMany(state.machines, machines)
     },
-    [loadMachines.rejected]: (state, { payload: error }) => {
+    [loadMachines.rejected]: (state, { error }) => {
       state.isLoading = false
-      state.errors.push(error)
+      state.errors.push(error.message)
     },
     [loadMachineDetails.fulfilled]: (state, { payload: machineDetails }) => {
       machineDetails.events.forEach(event =>
@@ -52,6 +52,9 @@ const machines = createSlice({
   }
 });
 
+export const {
+  selectAll: selectAllMachines
+} = machinesAdapter.getSelectors(state => state.machines.machines)
 export const {
   socketError,
   addEvent

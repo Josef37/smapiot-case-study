@@ -9,6 +9,6 @@ const store = configureStore({
 })
 
 subscribeTo("ERROR", () => store.dispatch(socketError()))
-subscribeTo("MESSAGE", msg => store.dispatch(addEvent(msg)))
+subscribeTo("MESSAGE", message => store.dispatch(addEvent(message)))
 
 export default store
