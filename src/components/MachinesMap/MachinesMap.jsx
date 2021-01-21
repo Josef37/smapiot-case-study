@@ -38,7 +38,7 @@ const MachinesMap = ({ machines, mapContainerProps = {}, disabled }) => {
             interactive={!disabled}
           >
             <Tooltip>
-              {machine.id}
+              {machine.name}
             </Tooltip>
           </Marker>
         ))

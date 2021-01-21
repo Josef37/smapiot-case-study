@@ -2,10 +2,10 @@ import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } fr
 import { v4 as uuidv4 } from "uuid";
 import { getMachineDetails, getMachines } from '../../api/rest';
 import memoize from "lodash/memoize";
-import { parseISO, compareAsc, compareDesc } from "date-fns";
+import { parseISO, compareDesc } from "date-fns";
 
 const machinesAdapter = createEntityAdapter({
-  sortComparer: (machine1, machine2) => compareAsc(parseISO(machine1.install_date), parseISO(machine2.install_date))
+  sortComparer: (machine1, machine2) => machine1 < machine2
 })
 const eventsAdatper = createEntityAdapter({
   sortComparer: (event1, event2) => compareDesc(parseISO(event1.timestamp), parseISO(event2.timestamp))
@@ -18,7 +18,13 @@ const initialState = {
   errors: []
 }
 
-export const loadMachines = createAsyncThunk("machines/load", () => getMachines())
+export const loadMachines = createAsyncThunk("machines/load", async (arg, { getState }) => {
+  const machines = await getMachines()
+  return machines.map((machine, index) => ({
+    name: `Machine ${index + 1}`,
+    ...machine
+  }))
+})
 export const loadMachineDetails = createAsyncThunk("machines/details", async (id) => {
   const machineDetails = await getMachineDetails(id)
   machineDetails.events = machineDetails.events.map(event => ({
