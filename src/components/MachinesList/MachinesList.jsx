@@ -3,7 +3,7 @@ import MachineListItem from './MachineListItem'
 
 const MachinesList = ({ machines }) => {
   return (
-    <ul>{
+    <ul style={{ height: "90vh", overflowY: "auto" }}>{
       machines.map(machine =>
         <li key={machine.id}>
           <MachineListItem {...machine} />

@@ -1,11 +1,11 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 
 const MachineListItem = ({ id, status, machine_type }) => (
-  <Link to={`/machines/${id}`}>
+  <NavLink to={`/machines/${id}`} style={{ display: "inline-block" }} activeStyle={{ backgroundColor: "#0804" }}>
     <div>Status: {status}</div>
     <div>Type: {machine_type}</div>
-  </Link>
+  </NavLink>
 )
 
 export default MachineListItem

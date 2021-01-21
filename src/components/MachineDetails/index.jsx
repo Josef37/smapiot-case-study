@@ -1,11 +1,14 @@
 import React from 'react'
+import { useSelector } from 'react-redux'
+import { selectMachineById } from '../../redux/slices/machines'
+import MachineDetails from "./MachineDetails"
 
-const MachineDetails = () => {
-  return (
-    <div>
+const MachineDetailsContainer = ({ id }) => {
+  const machine = useSelector(state => selectMachineById(state, id))
 
-    </div>
-  )
+  return machine
+    ? <MachineDetails {...machine} />
+    : "Loading machine details"
 }
 
-export default MachineDetails
+export default MachineDetailsContainer

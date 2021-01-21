@@ -1,9 +1,12 @@
-import { createAsyncThunk, createEntityAdapter, createSlice } from '@reduxjs/toolkit'
+import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit'
 import { v4 as uuidv4 } from "uuid";
 import { getMachineDetails, getMachines } from '../../api/rest';
+import memoize from "lodash/memoize";
 
 const machinesAdapter = createEntityAdapter()
-const eventsAdatper = createEntityAdapter()
+const eventsAdatper = createEntityAdapter({
+  sortComparer: (event1, event2) => event2.timestamp.localeCompare(event1.timestamp)
+})
 
 const initialState = {
   machines: machinesAdapter.getInitialState(),
@@ -50,11 +53,22 @@ const machines = createSlice({
       machinesAdapter.upsertOne(state.machines, machineDetails)
     }
   }
-});
+})
 
 export const {
-  selectAll: selectAllMachines
+  selectAll: selectAllEvents
+} = eventsAdatper.getSelectors(state => state.machines.events)
+export const {
+  selectAll: selectAllMachines,
+  selectById: selectMachineById
 } = machinesAdapter.getSelectors(state => state.machines.machines)
+export const selectEventsByMachineId = createSelector(
+  selectAllEvents,
+  events => memoize(
+    machine_id => events.filter(event => event.machine_id === machine_id)
+  )
+)
+
 export const {
   socketError,
   addEvent
