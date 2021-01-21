@@ -1,11 +1,11 @@
 import React from 'react'
 import { useHistory } from 'react-router-dom'
-import { MapContainer, TileLayer, Marker, Tooltip } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Tooltip, useMap } from 'react-leaflet'
 import { getIconByType } from '../../utils/mapIcon'
 import 'leaflet/dist/leaflet.css';
 
 const MachinesMap = ({ machines, mapContainerProps = {}, disabled }) => {
-  const outerBounds = machines.map(machine => ([
+  const mapBounds = machines.map(machine => ([
     machine.longitude,
     machine.latitude
   ]))
@@ -13,11 +13,13 @@ const MachinesMap = ({ machines, mapContainerProps = {}, disabled }) => {
 
   return (
     <MapContainer
-      bounds={outerBounds}
       zoomSnap={0.25}
+      bounds={mapBounds}
       {...(disabled && disabledMapProps)}
       {...mapContainerProps}
     >
+      {machines.length === 1
+        && <ChangeView center={mapBounds[0]} zoom={18} />}
       <TileLayer
         attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         maxZoom={22}
@@ -43,6 +45,12 @@ const MachinesMap = ({ machines, mapContainerProps = {}, disabled }) => {
       }
     </MapContainer>
   )
+}
+
+const ChangeView = ({ center, zoom }) => {
+  const map = useMap()
+  map.setView(center, zoom ?? map.getZoom())
+  return null
 }
 
 const disabledMapProps = {
