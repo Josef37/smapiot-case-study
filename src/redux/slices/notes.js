@@ -1,8 +1,11 @@
 import { createEntityAdapter, createSlice, createSelector } from '@reduxjs/toolkit'
 import { v4 as uuidv4 } from "uuid"
 import memoize from 'lodash/memoize'
+import { parseISO, compareDesc } from "date-fns";
 
-const notesAdapter = createEntityAdapter()
+const notesAdapter = createEntityAdapter({
+  sortComparer: (note1, note2) => compareDesc(parseISO(note1.timestamp), parseISO(note2.timestamp))
+})
 
 const initialState = notesAdapter.getInitialState()
 
@@ -12,7 +15,13 @@ const notesSlice = createSlice({
   reducers: {
     addNote: {
       reducer: notesAdapter.addOne,
-      prepare: note => ({ payload: { id: uuidv4(), ...note } })
+      prepare: note => ({
+        payload: {
+          id: uuidv4(),
+          timestamp: new Date().toISOString(),
+          ...note
+        }
+      })
     }
   }
 })

@@ -1,7 +1,9 @@
 import React from 'react'
+import { format, parseISO } from 'date-fns'
+import AddNote from '../AddNote'
 import MachinesMap from '../MachinesMap/MachinesMap'
 
-const MachineDetails = ({ machine }) => {
+const MachineDetails = ({ machine, notes }) => {
   const { id, status, machine_type, last_maintenance, install_date, floor } = machine
   return (
     <div>
@@ -20,6 +22,14 @@ const MachineDetails = ({ machine }) => {
         }}
         disabled
       />
+      <h2>Notes</h2>
+      <ul>{
+        notes.map(note => <li>
+          <p>[{format(parseISO(note.timestamp), "yyyy-MM-dd")}]</p>
+          <p>{note.content}</p>
+        </li>)
+      }</ul>
+      <AddNote machine_id={machine.id} />
     </div>
   )
 }

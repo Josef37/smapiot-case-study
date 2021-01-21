@@ -2,10 +2,13 @@ import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } fr
 import { v4 as uuidv4 } from "uuid";
 import { getMachineDetails, getMachines } from '../../api/rest';
 import memoize from "lodash/memoize";
+import { parseISO, compareAsc, compareDesc } from "date-fns";
 
-const machinesAdapter = createEntityAdapter()
+const machinesAdapter = createEntityAdapter({
+  sortComparer: (machine1, machine2) => compareAsc(parseISO(machine1.install_date), parseISO(machine2.install_date))
+})
 const eventsAdatper = createEntityAdapter({
-  sortComparer: (event1, event2) => event2.timestamp.localeCompare(event1.timestamp)
+  sortComparer: (event1, event2) => compareDesc(parseISO(event1.timestamp), parseISO(event2.timestamp))
 })
 
 const initialState = {
@@ -16,9 +19,17 @@ const initialState = {
 }
 
 export const loadMachines = createAsyncThunk("machines/load", () => getMachines())
-export const loadMachineDetails = createAsyncThunk("machines/details", (id) => getMachineDetails(id))
+export const loadMachineDetails = createAsyncThunk("machines/details", async (id) => {
+  const machineDetails = await getMachineDetails(id)
+  machineDetails.events = machineDetails.events.map(event => ({
+    id: uuidv4(),
+    machine_id: machineDetails.id,
+    ...event
+  }))
+  return machineDetails
+})
 
-const machines = createSlice({
+const machinesSlice = createSlice({
   name: "machines",
   initialState,
   reducers: {
@@ -42,13 +53,7 @@ const machines = createSlice({
       state.errors.push(error.message)
     },
     [loadMachineDetails.fulfilled]: (state, { payload: machineDetails }) => {
-      machineDetails.events.forEach(event =>
-        eventsAdatper.addOne(state.events, {
-          id: uuidv4(),
-          machine_id: machineDetails.id,
-          ...event
-        })
-      )
+      eventsAdatper.upsertMany(state.events, machineDetails.events)
       delete machineDetails.events
       machinesAdapter.upsertOne(state.machines, machineDetails)
     }
@@ -72,5 +77,5 @@ export const selectEventsByMachineId = createSelector(
 export const {
   socketError,
   addEvent
-} = machines.actions
-export default machines.reducer
+} = machinesSlice.actions
+export default machinesSlice.reducer
