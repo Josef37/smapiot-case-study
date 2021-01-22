@@ -6,37 +6,45 @@ import ListItemText from '@material-ui/core/ListItemText';
 import Typography from '@material-ui/core/Typography';
 import { styled } from '@material-ui/core/styles';
 
-export const EventListItem = ({ event, first }) => {
+export const EventListItem = ({ event }) => {
   const { machine_id, machineName, timestamp, status } = event
   const timeDistance = formatDistanceToNow(parseISO(timestamp), { addSuffix: true })
 
   return (
-    <ListItem>
+    <StyledListItem>
       <ListItemText>
         <StyledLink to={`/machines/${machine_id}`}>
-          <Title>{machineName}</Title>
+          <Title variant="h4">{machineName}</Title>
         </StyledLink>
         <Status>{status}</Status>
         <Timestamp>{timeDistance}</Timestamp>
       </ListItemText>
-    </ListItem>
+    </StyledListItem>
   )
 }
+
+const StyledListItem = styled(ListItem)({
+  "--base-size": "1rem",
+  "&:first-child": {
+    "--base-size": "2rem",
+  },
+})
 
 const StyledLink = styled(Link)({
   textDecoration: "none",
   color: "inherit"
 })
 
-const Title = styled(props =>
-  <Typography variant="h6" {...props} />
-)(({ theme }) => ({
+const Title = styled(Typography)({
   fontWeight: "bold",
-}))
+  fontSize: "calc(2 * var(--base-size))"
+})
 
-const Status = styled(Typography)({})
+const Status = styled(Typography)({
+  fontSize: "calc(1.2 * var(--base-size))"
+})
 
 const Timestamp = styled(Typography)(({ theme }) => ({
   color: theme.palette.grey[600],
-  fontSize: "0.7rem"
+  fontSize: "calc(0.8 * var(--base-size))"
 }))

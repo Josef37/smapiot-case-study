@@ -25,7 +25,10 @@ const Machines = () => {
 
 const Container = styled("div")({
   display: "grid",
-  gridTemplateColumns: "300px 1fr"
+  gridTemplateColumns: "300px 1fr",
+  "& > *": {
+    overflow: "hidden auto"
+  }
 })
 
 export default Machines

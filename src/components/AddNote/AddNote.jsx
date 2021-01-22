@@ -22,7 +22,9 @@ const AddNote = ({ handleAdd }) => {
 
   return (
     <div>
-      <Button onClick={openDialog} variant="contained" color="primary">Add Note</Button>
+      <Button onClick={openDialog} variant="contained" color="primary" style={{ fontSize: "1.4em" }}>
+        Add Note
+        </Button>
       <Dialog open={isOpen} onClose={closeDialog} fullWidth>
         <DialogTitle id="form-dialog-title">Add a new note to this machine</DialogTitle>
         <DialogContent>

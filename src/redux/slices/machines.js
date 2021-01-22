@@ -1,13 +1,13 @@
 import { createAsyncThunk, createEntityAdapter, createSelector, createSlice } from '@reduxjs/toolkit'
-import { v4 as uuidv4 } from "uuid";
 import { getMachineDetails, getMachines } from '../../api/rest';
 import memoize from "lodash/memoize";
 import { parseISO, compareDesc } from "date-fns";
 
 const machinesAdapter = createEntityAdapter({
-  sortComparer: (machine1, machine2) => machine1 < machine2
+  sortComparer: (machine1, machine2) => machine1?.name?.localeCompare(machine2?.name)
 })
 const eventsAdatper = createEntityAdapter({
+  selectId: (event) => `${event.timestamp},${event.machine_id},${event.status}`,
   sortComparer: (event1, event2) => compareDesc(parseISO(event1.timestamp), parseISO(event2.timestamp))
 })
 
@@ -21,14 +21,13 @@ const initialState = {
 export const loadMachines = createAsyncThunk("machines/load", async (arg, { getState }) => {
   const machines = await getMachines()
   return machines.map((machine, index) => ({
-    name: `Machine ${index + 1}`,
+    name: `Machine ${(machines.length - index).toString().padStart(Math.log10(machines.length) + 1, "0")}`,
     ...machine
   }))
 })
 export const loadMachineDetails = createAsyncThunk("machines/details", async (id) => {
   const machineDetails = await getMachineDetails(id)
   machineDetails.events = machineDetails.events.map(event => ({
-    id: uuidv4(),
     machine_id: machineDetails.id,
     ...event
   }))
@@ -44,6 +43,10 @@ const machinesSlice = createSlice({
     },
     addEvent: (state, { payload: event }) => {
       eventsAdatper.addOne(state.events, event)
+      machinesAdapter.updateOne(state.machines, {
+        id: event.machine_id,
+        changes: { status: event.status }
+      })
     },
   },
   extraReducers: {
@@ -52,7 +55,7 @@ const machinesSlice = createSlice({
     },
     [loadMachines.fulfilled]: (state, { payload: machines }) => {
       state.isLoading = false
-      machinesAdapter.addMany(state.machines, machines)
+      machinesAdapter.upsertMany(state.machines, machines)
     },
     [loadMachines.rejected]: (state, { error }) => {
       state.isLoading = false

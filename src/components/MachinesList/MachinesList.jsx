@@ -1,15 +1,14 @@
 import React from 'react'
 import MachineListItem from './MachineListItem'
+import List from '@material-ui/core/List'
 
 const MachinesList = ({ machines }) => {
   return (
-    <ul style={{ height: "90vh", overflowY: "auto" }}>{
+    <List>{
       machines.map(machine =>
-        <li key={machine.id}>
-          <MachineListItem {...machine} />
-        </li>
+        <MachineListItem key={machine.id} {...machine} />
       )
-    }</ul>
+    }</List>
   )
 }
 

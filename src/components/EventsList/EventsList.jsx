@@ -1,5 +1,6 @@
 import React from 'react'
 import List from '@material-ui/core/List'
+import Typography from '@material-ui/core/Typography';
 import useIntervalUpdate from '../../hooks/useIntervalUpdate'
 import { EventListItem } from './EventListItem'
 
@@ -12,12 +13,11 @@ const EventsList = ({ events }) => {
     ? <List>{
       events.map((event, index) =>
         <EventListItem
-          key={event.id}
+          key={event.id || index}
           event={event}
-          first={index === 0}
         />)
     }</List>
-    : "No events to display"
+    : <Typography>No events to display</Typography>
 }
 
 export default EventsList
