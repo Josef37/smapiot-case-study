@@ -6,8 +6,9 @@ import { parseISO, compareDesc } from "date-fns";
 const machinesAdapter = createEntityAdapter({
   sortComparer: (machine1, machine2) => machine1?.name?.localeCompare(machine2?.name)
 })
+const getEventId = (event) => `${event.timestamp},${event.machine_id},${event.status}`
 const eventsAdatper = createEntityAdapter({
-  selectId: (event) => `${event.timestamp},${event.machine_id},${event.status}`,
+  selectId: getEventId,
   sortComparer: (event1, event2) => compareDesc(parseISO(event1.timestamp), parseISO(event2.timestamp))
 })
 
@@ -18,12 +19,13 @@ const initialState = {
   errors: []
 }
 
+const addNamesToMachines = (machines) => machines.map((machine, index) => ({
+  name: `Machine ${(machines.length - index).toString().padStart(Math.log10(machines.length) + 1, "0")}`,
+  ...machine
+}))
 export const loadMachines = createAsyncThunk("machines/load", async (arg, { getState }) => {
   const machines = await getMachines()
-  return machines.map((machine, index) => ({
-    name: `Machine ${(machines.length - index).toString().padStart(Math.log10(machines.length) + 1, "0")}`,
-    ...machine
-  }))
+  return addNamesToMachines(machines)
 })
 export const loadMachineDetails = createAsyncThunk("machines/details", async (id) => {
   const machineDetails = await getMachineDetails(id)
@@ -47,7 +49,7 @@ const machinesSlice = createSlice({
         id: event.machine_id,
         changes: { status: event.status }
       })
-    },
+    }
   },
   extraReducers: {
     [loadMachines.pending]: (state, action) => {

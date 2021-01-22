@@ -1,6 +1,7 @@
 import React from 'react'
 import { useHistory } from 'react-router-dom'
 import { MapContainer, TileLayer, Marker, Tooltip, useMap } from 'react-leaflet'
+import Typography from '@material-ui/core/Typography';
 import { getIconByType } from '../../utils/mapIcon'
 import 'leaflet/dist/leaflet.css';
 
@@ -38,7 +39,7 @@ const MachinesMap = ({ machines, mapContainerProps = {}, disabled }) => {
             interactive={!disabled}
           >
             <Tooltip>
-              {machine.name}
+              <Typography style={{ fontSize: "1.4rem" }}>{machine.name}</Typography>
             </Tooltip>
           </Marker>
         ))
