@@ -1,5 +1,5 @@
 import React from 'react'
-import { parseISO, formatDistanceToNowStrict } from 'date-fns'
+import { parseISO, formatDistanceToNowStrict, differenceInDays } from 'date-fns'
 import AddNote from '../AddNote'
 import MachinesMap from '../MachinesMap/MachinesMap'
 import Typography from '@material-ui/core/Typography'
@@ -13,6 +13,9 @@ const MachineDetails = ({ machine, notes, events }) => {
   const { name, status, machine_type, last_maintenance, floor } = machine
   const uptime = formatDistanceToNowStrict(parseISO(last_maintenance))
   const numberOfErrors = events.filter(event => event.status === "errored").length
+  const eventLimitInDays = 30
+  const latestEvents = events.filter(event =>
+    eventLimitInDays > differenceInDays(Date.now(), parseISO(event.timestamp)))
 
   return (
     <Container>
@@ -38,10 +41,10 @@ const MachineDetails = ({ machine, notes, events }) => {
       />
 
       <Typography variant="h4" style={{ marginTop: 20 }}>
-        Events
+        Events <span style={{ fontSize: "0.6em" }}>from the last {eventLimitInDays} days</span>
       </Typography>
       <TimestampList
-        data={events}
+        data={latestEvents}
         getTimestamp={event => parseISO(event.timestamp)}
         getContent={event => event.status}
         emptyMsg="No events recorded..."
